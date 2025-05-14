@@ -1,4 +1,57 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Orders Page (Coming Soon)</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Orders Dashboard</h2>
+
+    {% if orders %}
+    <table class="table table-bordered table-hover bg-white shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Order ID</th>
+                <th>Seller</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.seller.name }}</td>
+                <td>{{ order.product.name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>${{ '%.2f' | format(order.total_price) }}</td>
+                <td>
+                    <span class="badge 
+                        {% if order.status == 'Pending' %}bg-warning text-dark
+                        {% elif order.status == 'Processing' %}bg-primary
+                        {% elif order.status == 'Shipped' %}bg-info text-dark
+                        {% elif order.status == 'Delivered' %}bg-success
+                        {% else %}bg-secondary
+                        {% endif %}">
+                        {{ order.status }}
+                    </span>
+                </td>
+                <td>
+                    <select class="form-select form-select-sm">
+                        <option {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                        <option {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                        <option {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert alert-info text-center">
+            You have no orders yet.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
