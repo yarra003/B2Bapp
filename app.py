@@ -1,6 +1,11 @@
 from flask import Flask
 from models import db
 
+    # Import and register routes
+from routes.auth_routes import auth_bp
+from routes.dashboard_routes import dashboard_bp
+from routes.shop_routes import shop_bp
+
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///b2b_platform.db'
@@ -9,12 +14,10 @@ def create_app():
 
     db.init_app(app)
 
-    # Import and register routes
-    from routes.auth_routes import auth_bp
-    from routes.dashboard_routes import dashboard_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(shop_bp, url_prefix='/shop')
 
     return app
 

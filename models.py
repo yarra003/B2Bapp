@@ -15,12 +15,10 @@ class User(db.Model):
     factory = db.relationship('Factory', backref='user', uselist=False)
     orders = db.relationship('Order', backref='seller', foreign_keys='Order.seller_id')
 
-
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-
 
 class Factory(db.Model):
     __tablename__ = 'factories'
@@ -34,9 +32,7 @@ class Factory(db.Model):
 
     category = db.relationship('Category', backref='factories')
     orders = db.relationship('Order', backref='factory', foreign_keys='Order.factory_id')
-
     products = db.relationship('Product', backref='factory', cascade="all, delete-orphan")
-
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -49,19 +45,20 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
-
 class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     factory_id = db.Column(db.Integer, db.ForeignKey('factories.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='Pending')  # Pending, Confirmed, etc.
     order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
+    shipping_address = db.Column(db.Text, nullable=False)
+    
+    payment_method = db.Column(db.String(50), nullable=True)  # Added field for payment method
+    
+    items = db.relationship('OrderItem', backref='order', cascade="all, delete-orphan")
+    receipt = db.relationship('Receipt', backref='order', uselist=False, cascade="all, delete-orphan")
 
 class OrderItem(db.Model):
     __tablename__ = 'order_items'
@@ -71,9 +68,7 @@ class OrderItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Float, nullable=False)  # price at time of order
 
-    order = db.relationship('Order', backref=db.backref('items', cascade="all, delete-orphan"))
     product = db.relationship('Product')
-
 
 class Receipt(db.Model):
     __tablename__ = 'receipts'
@@ -82,5 +77,3 @@ class Receipt(db.Model):
     amount_paid = db.Column(db.Float, nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)  # e.g., 'Credit Card', 'Bank Transfer'
     payment_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    order = db.relationship('Order', backref=db.backref('receipt', uselist=False))

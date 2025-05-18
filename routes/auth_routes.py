@@ -18,15 +18,17 @@ def login():
         session['user_id'] = user.id
         flash('Login successful!', 'success')
         if user.role == 'seller':
-            return redirect(url_for('dashboard.shop'))
+            return redirect(url_for('shop.browse'))
         elif user.role == 'factory':
             return redirect(url_for('dashboard.dashboard'))
         else:
             flash('Unknown user role.', 'error')
             return redirect(url_for('auth.index'))
-    else:
-        flash('Invalid email or password.', 'error')
-        return redirect(url_for('auth.index'))
+
+    # 🛠️ Handle failed login
+    flash('Invalid email or password.', 'error')
+    return redirect(url_for('auth.index'))
+
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
